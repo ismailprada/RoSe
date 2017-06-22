@@ -116,7 +116,13 @@ class htmlToStandard():
                     fileElem = et.SubElement(root,'document', file=os.path.basename(file))
 
                     # search for the element that encloses the metadata
-                    tooltipsMeta = doc.xpath("//tbody//span[contains(@id,'htmlPanelGroup31')]")
+                    try:
+                         tooltipsMeta = doc.xpath("//tbody//span[contains(@id,'htmlPanelGroup31')]")
+                    except:
+                         self._info.set("Die Datei {} konnte nicht gelesen werden!".format(file))
+                         root.remove(fileElem)
+                         continue # if file is empty or faulty, ignore it
+
 
                     for tooltipM in tooltipsMeta:
                         metaDataList = []
@@ -262,7 +268,10 @@ class htmlToStandard():
                         
                     # add the searchTerm to the file element
                     searchfield = doc.xpath("//input[contains(@id,'jsf:import:CNDHEForm:ListaCompleja:__row0:asyncTable:0:lema')]")
-                    searchTermOnFile = searchfield[0].get("value")
+                    if len(searchfield) == 0:
+                        searchTermOnFile = ""
+                    else:
+                        searchTermOnFile = searchfield[0].get("value")
                     fileElem.set('searchTerm',searchTermOnFile)
                     # print result entry to xml file
                     treeResult = et.tostring(fileElem, encoding = 'unicode', pretty_print=True)
