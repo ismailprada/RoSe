@@ -1,18 +1,25 @@
 #!/usr/bin/python3
 
 from RoSeData import htmlToStandardv5
+from RoSeData import SpanishTaggerv4
 from tkinter import *
 import webbrowser
 
-LAST_UPDATE = "21.06.2017"
-VERSION = "0.1"
+LAST_UPDATE = "22.06.2017"
+VERSION = "0.2"
 
 def htmlToStandard():
-    new_conv = htmlToStandardv5.htmlToStandard()
+    with open("RoSe.log", mode="a") as log:
+        log.write("Starting conversion of HTML files to one XML file.\n")
+        new_conv = htmlToStandardv5.htmlToStandard()
+        log.write("Conversion finished successfully!\n")
 
 def tagger():
-    pass
-    
+    with open("RoSe.log", mode="a") as log:
+        log.write("Starting Tagging process.\n")
+        new_tagger = SpanishTaggerv4.Tagger()
+        log.write("Tagging process finished successfully!\n")
+        
 def toWebanno():
     pass
     

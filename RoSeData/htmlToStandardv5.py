@@ -40,9 +40,6 @@ class htmlToStandard():
         counter_label = Label(self.ht, textvariable=self._count).grid(column=1, row=1)
         counter_label2 = Label(self.ht, text="Einträge verarbeitet").grid(column=1, row=2)
         
-        with open("RoSe.log", mode="a") as log:
-            log.write("Starting conversion of self.htML files to one XML file.\n")
-        
         mainloop()
         
     def _show_file(self):
@@ -326,7 +323,7 @@ class htmlToStandard():
 
         
 def main():
-    pass
+    new_project = htmlToStandard()
         
 if __name__ == "__main__":
     main()
