@@ -8,14 +8,14 @@ import glob
 import os
 import lxml.etree as et
 import regex
+import webbrowser
 from tkinter import *
 from tkinter import filedialog
 from tkinter import messagebox
 
 class htmlToStandard():
     def __init__(self):
-        print(re)
-        print(regex)
+        
         # Build App
         self.ht = Tk()
         self.ht.focus_force()
@@ -31,15 +31,22 @@ class htmlToStandard():
         self._outM = StringVar(self.ht, value="Hier Name der XML Meta-Datei eingeben")
         outM = Entry(self.ht, textvariable=self._outM, width=50).grid(padx=10, pady=10)
         
-        btn = Button(self.ht, text="Konversion starten", relief=RAISED, command=self.convert).grid(columnspan=2, sticky=W+E)
+        self.btn = Button(self.ht, text="Konversion starten", relief=RAISED, command=self.convert).grid(columnspan=2, sticky=W+E)
         
         self._info = StringVar(self.ht, value="")
         info = Message(self.ht, textvariable=self._info, width=500).grid(columnspan=2, pady=10)
+        
+        self._count = StringVar(self.ht, value="0")
+        counter_label = Label(self.ht, textvariable=self._count).grid(column=1, row=1)
+        counter_label2 = Label(self.ht, text="Einträge verarbeitet").grid(column=1, row=2)
         
         with open("RoSe.log", mode="a") as log:
             log.write("Starting conversion of self.htML files to one XML file.\n")
         
         mainloop()
+        
+    def _show_file(self):
+        webbrowser.open(self._outF.get()+".xml")
         
     def _set_directory(self):
         dirname = filedialog.askdirectory()
@@ -70,8 +77,8 @@ class htmlToStandard():
             incompletes = 0
 
             # open files to write
-            outXMLFile = open(self._outF.get(),encoding='utf-8',mode='w')
-            outMetaFile = open(self._outM.get(),encoding='utf-8',mode='w')
+            outXMLFile = open(self._outF.get()+".xml",encoding='utf-8',mode='w')
+            outMetaFile = open(self._outM.get()+".xml",encoding='utf-8',mode='w')
         
             # create root element for the generated xml files  
             root = et.Element('corpus')
@@ -246,6 +253,9 @@ class htmlToStandard():
                             resultElem.set('style','poem')
                         else:
                             resultElem.set('style','plain')
+                            
+                        self._count.set(str(completes+incompletes))
+                        self.ht.update()
                         
                         # Temporary for testing
                         #if completeSentFinish and completeSentStart:
@@ -291,6 +301,8 @@ class htmlToStandard():
             info += "Total of incomplete sentences: {}\n".format(str(incompletes))
             info += "Total of all sentences: {}\n".format(str(completes+incompletes))
             self._info.set(info)
+            
+            show_file = Button(self.ht, text="Zeige Datei", command=self._show_file).grid(row=4, column=1)
 
             outXMLFile.close()
             outMetaFile.close()
@@ -298,8 +310,10 @@ class htmlToStandard():
     @staticmethod
     def _sent_split(phrase):
         abbreviations = r'Mr|Dr|Sr|Mrs|Sra|Dra|Av|D|Da|Gob|Gral|Ing|Prof|Profa|Srta'
-        sentence_endings = r'\.|!|\?|—|»|«'
-        sentence_starters = r'\p{Lu}|¿|¡|-|»|"| |*|—|«'
+        #sentence_endings = r'\.|!|\?|—|»|«'
+        #sentence_starters = r'\p{Lu}|¿|¡|-|»|"| |*|—|«'
+        sentence_starters = r'\p{Lu}¿¡»" *—«-'
+        sentence_endings = r'.!?—»«'
         
         splitPattern = r'(?<!\([^\)]*?(?=(?<=(?<!'+abbreviations+')['+sentence_endings+']"?)[ |\n](?=['+sentence_starters+'])[^\(\)]*\)))(?<=(?<!'+abbreviations+')['+sentence_endings+']"?)[ |\n](?=['+sentence_starters+'])'
         splitPattern2 = r'(?<=:"?)[ |\n]'
@@ -309,6 +323,7 @@ class htmlToStandard():
         phraseList = regex.split(pattern, phrase)
         
         return phraseList
+
         
 def main():
     pass
