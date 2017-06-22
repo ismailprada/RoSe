@@ -7,13 +7,15 @@
 import glob
 import os
 import lxml.etree as et
-import regex as re
+import regex
 from tkinter import *
 from tkinter import filedialog
 from tkinter import messagebox
 
 class htmlToStandard():
     def __init__(self):
+        print(re)
+        print(regex)
         # Build App
         self.ht = Tk()
         self.ht.focus_force()
@@ -32,7 +34,7 @@ class htmlToStandard():
         btn = Button(self.ht, text="Konversion starten", relief=RAISED, command=self.convert).grid(columnspan=2, sticky=W+E)
         
         self._info = StringVar(self.ht, value="")
-        info = Message(self.ht, textvariable=self._info, width=50).grid(columnspan=2, pady=10)
+        info = Message(self.ht, textvariable=self._info, width=500).grid(columnspan=2, pady=10)
         
         with open("RoSe.log", mode="a") as log:
             log.write("Starting conversion of self.htML files to one XML file.\n")
@@ -56,7 +58,7 @@ class htmlToStandard():
             tupled_filelist = []
             for file in filelist:
                 filename = os.path.basename(file)
-                number = re.findall(r'\d+',filename)
+                number = regex.findall(r'\d+',filename)
                 tupled_filelist.append((int(number[0]),file))
             if len(tupled_filelist) < 1:
                 messagebox.showerror(title="Keine HTMLs gefunden", message="Unter dem von dir angegebenen Dateipfad konnten keine HTML-Dateien gefunden werden.")
@@ -189,18 +191,10 @@ class htmlToStandard():
                         contextList.extend([firstPartContextText, searchTerm[0].text.strip(),secondPartContextText])
                         phrase = ' '.join(contextList)
                         
-                        # cut away unneeded context (so only sentence with searchTerm remains)
-                        #More abbreviations can be added but have to be added to both conditions
-                        abbreviations = r'Mr|Dr|Sr|Mrs|Sra|Dra|Av|D|Da|Gob|Gral|Ing|Prof|Profa|Srta'
-                        sentence_endings = r'\.|!|\?|—|»|«'
-                        sentence_starters = r'\p{Lu}|¿|¡|-|»|"| |*|—|«'
+                        phraseList = self._sent_split(phrase)
                         
-                        splitPattern = r'(?<!\([^\)]*?(?=(?<=(?<!'+abbreviations+')['+sentence_endings+']"?)[ |\n](?=['+sentence_starters+'])[^\(\)]*\)))(?<=(?<!'+abbreviations+')['+sentence_endings+']"?)[ |\n](?=['+sentence_starters+'])'
-                        splitPattern2 = r'(?<=:"?)[ |\n]'
-                        
-                        phraseList = re.split(splitPattern+'|'+splitPattern2,phrase)
                         for partPhrase in phraseList:
-                            foundWord = re.search(searchTerm[0].text.strip(),partPhrase)
+                            foundWord = regex.search(searchTerm[0].text.strip(),partPhrase)
                             if foundWord:
                                 clearPhrase = partPhrase
                                 if partPhrase == phraseList[0]:
@@ -220,7 +214,7 @@ class htmlToStandard():
                         #outTestFile.write("\n" + clearPhrase + "\n\n")
 
                         # check if phrase is a poem (identified by multiple \n in between other signs)
-                        poemTrue = re.search('.+\n.+\n',clearPhrase)
+                        poemTrue = regex.search('.+\n.+\n',clearPhrase)
                         metaDataList = year
                         metaDataList.extend(author)
                         metaDataList.extend(pubTitle)
@@ -230,10 +224,10 @@ class htmlToStandard():
                         resultElem = et.SubElement(fileElem,'phrase', id=str(phraseid),foundTerm=searchTerm[0].text.strip(), authorID=str(this_authid), publicationID=str(this_pubid))
                         phraseid += 1
                         # check if sentence is complete (at least the end)
-                        completeSentFinish = re.search(u'[\.\?!:"«»\']', clearPhrase[-1])               
-                        completeSentStart = re.search(u'[\p{Lu}¿¡"«»\']',clearPhrase[0])
+                        completeSentFinish = regex.search(u'[\.\?!:"«»\']', clearPhrase[-1])               
+                        completeSentStart = regex.search(u'[\p{Lu}¿¡"«»\']',clearPhrase[0])
                         #Do a special check for sentences after ':'
-                        lookforPoints = re.search(r':', beforePhrase[-1])
+                        lookforPoints = regex.search(r':', beforePhrase[-1])
                         if lookforPoints:
                             completeSentStart = True
                         # add text to xml elements
@@ -292,7 +286,7 @@ class htmlToStandard():
             outMetaFile.write("</" + metaroot.tag + ">")
 
             # print out some statistics
-            info += "Finished parsing!\n"
+            info = "Finished parsing!\n"
             info += "Total of complete sentences: {}\n".format(str(completes))
             info += "Total of incomplete sentences: {}\n".format(str(incompletes))
             info += "Total of all sentences: {}\n".format(str(completes+incompletes))
@@ -300,6 +294,21 @@ class htmlToStandard():
 
             outXMLFile.close()
             outMetaFile.close()
+            
+    @staticmethod
+    def _sent_split(phrase):
+        abbreviations = r'Mr|Dr|Sr|Mrs|Sra|Dra|Av|D|Da|Gob|Gral|Ing|Prof|Profa|Srta'
+        sentence_endings = r'\.|!|\?|—|»|«'
+        sentence_starters = r'\p{Lu}|¿|¡|-|»|"| |*|—|«'
+        
+        splitPattern = r'(?<!\([^\)]*?(?=(?<=(?<!'+abbreviations+')['+sentence_endings+']"?)[ |\n](?=['+sentence_starters+'])[^\(\)]*\)))(?<=(?<!'+abbreviations+')['+sentence_endings+']"?)[ |\n](?=['+sentence_starters+'])'
+        splitPattern2 = r'(?<=:"?)[ |\n]'
+        
+        pattern = regex.compile(splitPattern+"|"+splitPattern2)
+        
+        phraseList = regex.split(pattern, phrase)
+        
+        return phraseList
         
 def main():
     pass
