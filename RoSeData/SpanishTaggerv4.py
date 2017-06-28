@@ -32,7 +32,7 @@ class Tagger():
         self._outF = StringVar(self.root, value="Hier Name für getaggte Datei eingeben")
         outF = Entry(self.root, textvariable=self._outF, width=50).grid(columnspan=2, padx=10, pady=10)
 
-        separator = Frame(height=2, bd=1, relief=SUNKEN).grid(columnspan=3, sticky=W+E, padx=5, pady=5)
+        separator = Frame(self.root, height=2, bd=1, relief=SUNKEN).grid(columnspan=3, sticky=W+E, padx=5, pady=5)
         
         label = Label(self.root, text="Erlaubt Stile:").grid(row=3, column=0, sticky=E, padx=10, pady=5)
         
@@ -49,7 +49,7 @@ class Tagger():
         self._webanno = IntVar(self.root, value=0)
         Checkbutton(self.root, text="Datei für Webanno-Import ausgeben", variable=self._webanno).grid(column=1, sticky=W)
         
-        separator = Frame(height=2, bd=1, relief=SUNKEN).grid(columnspan=3, sticky=W+E, padx=5, pady=5)
+        separator = Frame(self.root, height=2, bd=1, relief=SUNKEN).grid(columnspan=3, sticky=W+E, padx=5, pady=5)
         
         tag_btn = Button(self.root, text="Tagging-Prozess starten", relief=RAISED, command=self.tag).grid(columnspan=3, sticky=W+E, pady=10, padx=5)
         
@@ -61,7 +61,7 @@ class Tagger():
         mainloop()
         
     def _show_file(self):
-        webbrowser.open(self._outF.get()+".xml")
+        webbrowser.open("output/"+self._outF.get()+".xml")
         
     def _set_file(self):
         dirname = filedialog.askopenfilename(filetypes=[("XML files","*.xml")])
@@ -109,7 +109,7 @@ class Tagger():
         
         # create tokenizer and splitter
         tk=freeling.tokenizer(PATH+"tokenizer.dat");
-        sp=freeling.splitter(PATH+"no_splitter.dat"); # a splitter is necessary for the process, 
+        sp=freeling.splitter("RoSeData/no_splitter.dat"); # a splitter is necessary for the process, 
         sid=sp.open_session();                        # but our data is already split. no_splitter.dat tells the splitter to never split
 
         # create options set for maco analyzer. Default values are Ok, except for data files.
@@ -156,7 +156,7 @@ class Tagger():
         outputter = freeling.output_conll()
         
         # Write headers
-        outf = open(self._outF.get()+".xml",encoding='utf-8',mode='w')
+        outf = open("output/"+self._outF.get()+".xml",encoding='utf-8',mode='w')
         outf.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
         outf.write("<corpus>\n")
         # Start Tagging Process
@@ -164,6 +164,8 @@ class Tagger():
             iterate_docs = ET.iterparse(self._indir.get(), events=("end", ), tag="document")
         except:
             messagebox.showerror(title="Ungültiger Dateipfad", message="Unter dem angegebenen Dateipfad konnte keine XMl-Datei gefunden werden.")
+            self._info.set("Process stopped.")
+            self.root.update()
             return None
         for action, doc in iterate_docs: # iterate all fileElems
             if True: # filter in case you only want certain docs

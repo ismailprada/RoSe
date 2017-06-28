@@ -19,7 +19,7 @@ class htmlToStandard():
         # Build App
         self.ht = Tk()
         self.ht.focus_force()
-        self.ht.title("self.htML-Standard-Konversion (CNDH)")
+        self.ht.title("HTML-Standard-Konversion (CNDH)")
         
         self._indir = StringVar(self.ht, value="Hier Pfad zu Verzeichnis mit HTMLs eingeben")
         inDir = Entry(self.ht, textvariable=self._indir, width=50).grid(padx=10, pady=10)
