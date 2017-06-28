@@ -43,7 +43,7 @@ class htmlToStandard():
         mainloop()
         
     def _show_file(self):
-        webbrowser.open(self._outF.get()+".xml")
+        webbrowser.open("output/"+self._outF.get()+".xml")
         
     def _set_directory(self):
         dirname = filedialog.askdirectory()
@@ -60,10 +60,22 @@ class htmlToStandard():
         else:
             filelist = glob.iglob(os.path.join(self._indir.get(), '*.htm*'))
             tupled_filelist = []
+            found_no_number = False
             for file in filelist:
                 filename = os.path.basename(file)
                 number = regex.findall(r'\d+',filename)
-                tupled_filelist.append((int(number[0]),file))
+                if len(number) < 1:
+                    # If no number is found in filename, just append it
+                    # as number 0
+                    tupled_filelist.append((0, file))
+                    found_no_number = True
+                else:
+                    tupled_filelist.append((int(number[0]),file))
+            if found_no_number: # Triggered if one or more files had no number
+                if messagebox.askyesno("Files Without Number", "One or more file names contain no number. Do you want to continue? (Files without number will be inserted as first in the XML.)"):
+                    pass
+                else:
+                    exit()
             if len(tupled_filelist) < 1:
                 messagebox.showerror(title="Keine HTMLs gefunden", message="Unter dem von dir angegebenen Dateipfad konnten keine HTML-Dateien gefunden werden.")
                 return None
@@ -74,8 +86,8 @@ class htmlToStandard():
             incompletes = 0
 
             # open files to write
-            outXMLFile = open(self._outF.get()+".xml",encoding='utf-8',mode='w')
-            outMetaFile = open(self._outM.get()+".xml",encoding='utf-8',mode='w')
+            outXMLFile = open("output/"+self._outF.get()+".xml",encoding='utf-8',mode='w')
+            outMetaFile = open("output/"+self._outM.get()+".xml",encoding='utf-8',mode='w')
         
             # create root element for the generated xml files  
             root = et.Element('corpus')
