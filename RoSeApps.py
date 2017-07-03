@@ -3,6 +3,7 @@
 from RoSeData import htmlToStandardv5
 from RoSeData import SpanishTaggerv4
 from RoSeData import StandardToWebannov2
+from RoSeData import ToStandardv3
 from tkinter import *
 import webbrowser
 
@@ -21,17 +22,19 @@ def tagger():
         
 def toWebanno():
     with open("RoSe.log", mode="a") as log:
-        log.write("Starting Conversion process.\n")
+        log.write("Starting Conversion from Standard to Webanno.\n")
         new_conv = StandardToWebannov2.ToWebanno()
     
 def toStandard():
-    pass
+    with open("RoSe.log", mode="a") as log:
+        log.write("Starting Conversion from Webanno to Standard.\n")
+        new_conv = ToStandardv3.ToStandard()
     
 def search():
     pass
     
 def more_info():
-    webbrowser.open("http://www.rose.uzh.ch/de/forschung.html")
+    webbrowser.open("http://www.rose.uzh.ch/de/forschung/dom.html")
 
 def show_doc():
     webbrowser.open("RoSeData/Dokumentation.pdf")
