@@ -4,11 +4,12 @@ from RoSeData import htmlToStandardv5
 from RoSeData import SpanishTaggerv4
 from RoSeData import StandardToWebannov2
 from RoSeData import ToStandardv3
+from RoSeData import searchv4
 from tkinter import *
 import webbrowser
 
-LAST_UPDATE = "22.06.2017"
-VERSION = "0.2"
+LAST_UPDATE = "02.08.2017"
+VERSION = "0.3"
 
 def htmlToStandard():
     with open("RoSe.log", mode="a") as log:
@@ -31,7 +32,9 @@ def toStandard():
         new_conv = ToStandardv3.ToStandard()
     
 def search():
-    pass
+    with open("RoSe.log", mode="a") as log:
+        log.write("Starting Search Module.\n")
+        new_search = searchv4.Search()
     
 def more_info():
     webbrowser.open("http://www.rose.uzh.ch/de/forschung/dom.html")
