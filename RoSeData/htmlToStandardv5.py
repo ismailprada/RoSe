@@ -3,6 +3,7 @@
 
 # New in 4.1: id now starts at 1 to be more like Webanno
 # New in 5.0: Implemented as a Tkinter App and as a class
+# New in 5.1: The Text-Testfile is back!
 
 import glob
 import os
@@ -43,7 +44,10 @@ class htmlToStandard():
         mainloop()
         
     def _show_file(self):
-        webbrowser.open("output/"+self._outF.get()+".xml")
+        if os.path.isdir("output/"):
+            webbrowser.open("output/"+self._outF.get()+".xml")
+        else:
+            webbrowser.open(self._indir.get()+"/"+self._outF.get()+".xml")
         
     def _set_directory(self):
         dirname = filedialog.askdirectory()
@@ -86,8 +90,15 @@ class htmlToStandard():
             incompletes = 0
 
             # open files to write
-            outXMLFile = open("output/"+self._outF.get()+".xml",encoding='utf-8',mode='w')
-            outMetaFile = open("output/"+self._outM.get()+".xml",encoding='utf-8',mode='w')
+            if os.path.isdir("output/"):
+                outXMLFile = open("output/"+self._outF.get()+".xml",encoding='utf-8',mode='w')
+                outMetaFile = open("output/"+self._outM.get()+".xml",encoding='utf-8',mode='w')
+                outTestFile = open("output/"+self._outF.get()+".txt",encoding='utf-8',mode='w')
+            else:
+                # If no directory "output" exists, file are written into the directory the htmls are in
+                outXMLFile = open(self._indir.get()+"/"+self._outF.get()+".xml",encoding='utf-8',mode='w')
+                outMetaFile = open(self._indir.get()+"/"+self._outM.get()+".xml",encoding='utf-8',mode='w')
+                outTestFile = open(self._indir.get()+"/"+self._outF.get()+".txt",encoding='utf-8',mode='w')
         
             # create root element for the generated xml files  
             root = et.Element('corpus')
@@ -199,9 +210,19 @@ class htmlToStandard():
                             authid += 1
                                     
                         # get elements that are in the same table row and contain the tooltip text for the context
-                        firstPartContext = tooltipM.xpath("ancestor::tr//span[@class='datos_cabecera' and @id[contains(.,'htmlOutputText111')]]")
-                        searchTerm = firstPartContext[0].xpath("../span[contains(@id,'htmlOutputText71')]")
-                        secondPartContext = firstPartContext[0].xpath("../span[contains(@id,'htmlOutputText181')]")
+                        firstPart = tooltipM.xpath("ancestor::tr//span")
+
+                        #~ for f in firstPart:
+                            #~ try:
+                                #~ print(f.attrib["id"])
+                            #~ except:
+                                #~ pass
+                        try: # to remove later
+                            firstPartContext = tooltipM.xpath("ancestor::tr//span[@class='datos_cabecera' and @id[contains(.,'htmlOutputText111')]]")
+                            searchTerm = firstPartContext[0].xpath("../span[contains(@id,'htmlOutputText71')]")
+                            secondPartContext = firstPartContext[0].xpath("../span[contains(@id,'htmlOutputText181')]")
+                        except:
+                            continue
                         if firstPartContext[0].text:
                             firstPartContextText = firstPartContext[0].text.strip()
                         else:
@@ -229,11 +250,11 @@ class htmlToStandard():
                         clearPhrase = clearPhrase.rstrip(',')
                         
                         #only for bugfixing
-                        #outTestFile.write("-------------------\n\n")
-                        #outTestFile.write(phrase + "\n\n")
-                        #for element in phraseList:
-                            #outTestFile.write(element + "\n")
-                        #outTestFile.write("\n" + clearPhrase + "\n\n")
+                        outTestFile.write("-------------------\n\n")
+                        outTestFile.write(phrase + "\n\n")
+                        for element in phraseList:
+                            outTestFile.write(element + "\n")
+                        outTestFile.write("\n" + clearPhrase + "\n\n")
 
                         # check if phrase is a poem (identified by multiple \n in between other signs)
                         poemTrue = regex.search('.+\n.+\n',clearPhrase)
@@ -273,10 +294,10 @@ class htmlToStandard():
                         self.ht.update()
                         
                         # Temporary for testing
-                        #if completeSentFinish and completeSentStart:
-                            #outTestFile.write("This file was found to be COMPLETE\n")
-                        #else:
-                            #outTestFile.write("This file was found to NOT BE COMPLETE\n")
+                        if completeSentFinish and completeSentStart:
+                            outTestFile.write("This file was found to be COMPLETE\n")
+                        else:
+                            outTestFile.write("This file was found to NOT BE COMPLETE\n")
                         
                     # add the searchTerm to the file element
                     searchfield = doc.xpath("//input[contains(@id,'jsf:import:CNDHEForm:ListaCompleja:__row0:asyncTable:0:lema')]")
@@ -324,6 +345,7 @@ class htmlToStandard():
 
             outXMLFile.close()
             outMetaFile.close()
+            outTestFile.close()
             
     @staticmethod
     def _sent_split(phrase):
