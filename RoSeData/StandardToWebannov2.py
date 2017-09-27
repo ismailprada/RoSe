@@ -9,6 +9,7 @@
 import csv
 import os
 from tkinter import *
+from tkinter.ttk import Combobox
 from tkinter import filedialog
 from tkinter import messagebox
 from lxml import etree as ET
@@ -32,7 +33,7 @@ class ToWebanno():
         
         self._styles = StringVar(self.root, value="")
         possible_styles = ["all", "plain", "poem"]
-        self.styles = OptionMenu(self.root, self._styles, *possible_styles).grid(row=3, column=1, sticky=W+E, padx=10, pady=5)
+        self.styles = Combobox(self.root, values=possible_styles, textvariable=self._styles).grid(row=3, column=1, sticky=W+E, padx=10, pady=5)
         
         label = Label(self.root, text="Anzahl Sätze pro Datei:").grid(row=4, column=0, sticky=E, padx=10, pady=5)
         self._ppf = IntVar(self.root, value=200)
