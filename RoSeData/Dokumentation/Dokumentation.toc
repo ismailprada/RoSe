@@ -1,0 +1,29 @@
+\contentsline {section}{\numberline {1}Datenformate}{1}{section.1}
+\contentsline {subsection}{\numberline {1.1}Standard-XML: RoXML}{1}{subsection.1.1}
+\contentsline {subsubsection}{\numberline {1.1.1}Die Metadaten}{2}{subsubsection.1.1.1}
+\contentsline {subsection}{\numberline {1.2}WebAnno-TSV}{2}{subsection.1.2}
+\contentsline {subsubsection}{\numberline {1.2.1}Metadata}{2}{subsubsection.1.2.1}
+\contentsline {section}{\numberline {2}Arbeitsablauf}{2}{section.2}
+\contentsline {subsection}{\numberline {2.1}Allgemein}{2}{subsection.2.1}
+\contentsline {subsection}{\numberline {2.2}Am Beispiel CNDH}{2}{subsection.2.2}
+\contentsline {section}{\numberline {3}Benutzung der Applikationen}{3}{section.3}
+\contentsline {subsection}{\numberline {3.1}Allgemeine technische Voraussetzungen}{3}{subsection.3.1}
+\contentsline {subsection}{\numberline {3.2}\"Ubersicht}{3}{subsection.3.2}
+\contentsline {subsection}{\numberline {3.3}HTML zu XML}{3}{subsection.3.3}
+\contentsline {subsubsection}{\numberline {3.3.1}Zweck}{3}{subsubsection.3.3.1}
+\contentsline {subsubsection}{\numberline {3.3.2}Bedienung}{3}{subsubsection.3.3.2}
+\contentsline {subsection}{\numberline {3.4}XML Taggen}{4}{subsection.3.4}
+\contentsline {subsubsection}{\numberline {3.4.1}Zweck}{4}{subsubsection.3.4.1}
+\contentsline {subsubsection}{\numberline {3.4.2}Bedienung}{4}{subsubsection.3.4.2}
+\contentsline {subsubsection}{\numberline {3.4.3}Tagsets}{4}{subsubsection.3.4.3}
+\contentsline {subsection}{\numberline {3.5}XML zu Webanno}{4}{subsection.3.5}
+\contentsline {subsubsection}{\numberline {3.5.1}Zweck}{4}{subsubsection.3.5.1}
+\contentsline {subsubsection}{\numberline {3.5.2}Bedienung}{5}{subsubsection.3.5.2}
+\contentsline {subsection}{\numberline {3.6}Webanno zu Standard}{5}{subsection.3.6}
+\contentsline {subsubsection}{\numberline {3.6.1}Zweck}{5}{subsubsection.3.6.1}
+\contentsline {subsubsection}{\numberline {3.6.2}Bedienung}{5}{subsubsection.3.6.2}
+\contentsline {subsection}{\numberline {3.7}XML durchsuchen}{5}{subsection.3.7}
+\contentsline {subsubsection}{\numberline {3.7.1}Zweck}{5}{subsubsection.3.7.1}
+\contentsline {subsubsection}{\numberline {3.7.2}Bedienung}{5}{subsubsection.3.7.2}
+\contentsline {section}{\numberline {4}In Planung}{6}{section.4}
+\contentsline {subsection}{\numberline {4.1}PRESEAAToStandard}{6}{subsection.4.1}

@@ -1,41 +1,73 @@
 #!/usr/bin/python3
 
-from RoSeData import htmlToStandardv5
-from RoSeData import SpanishTaggerv4
-from RoSeData import StandardToWebannov2
-from RoSeData import ToStandardv3
-from RoSeData import searchv4_1
+missing_module_message = "One or more modules are missing. Some functions might not work."
+try:
+    from RoSeData import htmlToStandardv5
+except:
+    print(missing_module_message)
+try:
+    from RoSeData import SpanishTaggerv4
+except:
+    print(missing_module_message)
+try:
+    from RoSeData import StandardToWebannov2
+except:
+    print(missing_module_message)
+try:
+    from RoSeData import ToStandardv3
+except:
+    print(missing_module_message)
+try:
+    from RoSeData import searchv4_1
+except:
+    print(missing_module_message)
 from tkinter import *
+from tkinter import messagebox
 import webbrowser
 
 LAST_UPDATE = "02.08.2017"
 VERSION = "0.3"
 
 def htmlToStandard():
-    with open("RoSe.log", mode="a") as log:
-        log.write("Starting conversion of HTML files to one XML file.\n")
-        new_conv = htmlToStandardv5.htmlToStandard()
+    try:
+        with open("RoSe.log", mode="a") as log:
+            log.write("Starting conversion of HTML files to one XML file.\n")
+            new_conv = htmlToStandardv5.htmlToStandard()
+    except:
+        messagebox.showerror(title="Fehlende Module", message="Die Module lxml und regex werden für dieses Werkzeug benötigt. Installieren Sie diese und versuchen Sie es dann erneut.")
 
 def tagger():
-    with open("RoSe.log", mode="a") as log:
-        log.write("Starting Tagging process.\n")
-        new_tagger = SpanishTaggerv4.Tagger()
+    try:
+        with open("RoSe.log", mode="a") as log:
+            log.write("Starting Tagging process.\n")
+            new_tagger = SpanishTaggerv4.Tagger()
+    except NameError:
+        messagebox.showerror(title="Fehlende Module", message="Die Module lxml und freeling werden für dieses Werkzeug benötigt. Installieren Sie diese und versuchen Sie es dann erneut.")
         
 def toWebanno():
-    with open("RoSe.log", mode="a") as log:
-        log.write("Starting Conversion from Standard to Webanno.\n")
-        new_conv = StandardToWebannov2.ToWebanno()
-    
+    try:
+        with open("RoSe.log", mode="a") as log:
+            log.write("Starting Conversion from Standard to Webanno.\n")
+            new_conv = StandardToWebannov2.ToWebanno()
+    except NameError:
+        messagebox.showerror(title="Fehlende Module", message="Das Modul lxml wird für dieses Werkzeug benötigt. Installieren Sie diese und versuchen Sie es dann erneut.")
+
 def toStandard():
-    with open("RoSe.log", mode="a") as log:
-        log.write("Starting Conversion from Webanno to Standard.\n")
-        new_conv = ToStandardv3.ToStandard()
-    
+    try:
+        with open("RoSe.log", mode="a") as log:
+            log.write("Starting Conversion from Webanno to Standard.\n")
+            new_conv = ToStandardv3.ToStandard()
+    except:
+        messagebox.showerror(title="Fehlende Module", message="Das Modul lxml wird für dieses Werkzeug benötigt. Installieren Sie diese und versuchen Sie es dann erneut.")
+
 def search():
-    with open("RoSe.log", mode="a") as log:
-        log.write("Starting Search Module.\n")
-        new_search = searchv4_1.Search()
-    
+    try:
+        with open("RoSe.log", mode="a") as log:
+            log.write("Starting Search Module.\n")
+            new_search = searchv4_1.Search()
+    except:
+        messagebox.showerror(title="Fehlende Module", message="Das Modul lxml wird für dieses Werkzeug benötigt. Installieren Sie diese und versuchen Sie es dann erneut.")
+
 def more_info():
     webbrowser.open("http://www.rose.uzh.ch/de/forschung/dom.html")
 
