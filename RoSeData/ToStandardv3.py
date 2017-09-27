@@ -96,7 +96,7 @@ class ToStandard():
                     attr_name[0] = 'dep_tag'
                 header_dict[attr_name[0].lower()] = num+1 # fit to columns
         # check if a original standard file is given
-        if self._indir.get() != "Hier Pfad zu Standard-XML-Datei eingeben":
+        if self._indir.get() != "Hier Pfad zu Standard-XML-Datei eingeben" and self._indir.get() != "" and "metadata" in header_dict:
             try:
                 tree = et.parse(self._indir.get())
             except:
@@ -109,50 +109,51 @@ class ToStandard():
             # Check if metadata is found
             # if yes, read metadata and append phrases accordingly
             # if no, simply append phrases one after the other => TODO
-            if "metadata" in header_dict:
-                for phrase_id, phrase in phrasedict.items():
-                    # Read metadata
-                    metadata = phrase[1][0][header_dict["metadata"]].split(", ")
-                    # find the correct node
-                    corr_phrase = root.xpath("//phrase[@id={}]".format(metadata[2]))
-                    if corr_phrase:
-                        if len(corr_phrase) > 1:
-                            self._info2.set("Phrase {}: Multiple corresponding phrases were found, data will be appended to first occurence".format(str(phrase_id)))
-                        corr_phrase = corr_phrase[0]
-                        mode = self.mode.get()
-                        if mode == "full overwrite":
-                            # delete all old children
-                            for child in corr_phrase:
-                                corr_phrase.remove(child)
-                            # append new ones
+            for phrase_id, phrase in phrasedict.items():
+                # Read metadata
+                metadata = phrase[1][0][header_dict["metadata"]].split(", ")
+                # find the correct node
+                corr_phrase = root.xpath("//phrase[@id={}]".format(metadata[2]))
+                if corr_phrase:
+                    if len(corr_phrase) > 1:
+                        self._info2.set("Phrase {}: Multiple corresponding phrases were found, data will be appended to first occurence".format(str(phrase_id)))
+                    corr_phrase = corr_phrase[0]
+                    mode = self.mode.get()
+                    if mode == "full overwrite":
+                        # delete all old children
+                        for child in corr_phrase:
+                            corr_phrase.remove(child)
+                        # append new ones
+                        for token in phrasedict[phrase_id][1]:
+                            new_id = "{}-{}".format(corr_phrase.attrib['id'],str(token[0]).split("-")[1])
+                            tokenElem = et.SubElement(corr_phrase, 'token', id = new_id)
+                            tokenElem.text = token[1]
+                            setAttributes(tokenElem, header_dict, corr_phrase, token)
+                    elif mode == "replace changed ones (requires id)":
+                        # check which childrens have changed
+                        # only delete and replace new ones
+                        for child in corr_phrase:
                             for token in phrasedict[phrase_id][1]:
-                                new_id = "{}-{}".format(corr_phrase.attrib['id'],str(token[0]).split("-")[1])
-                                tokenElem = et.SubElement(corr_phrase, 'token', id = new_id)
-                                tokenElem.text = token[1]
-                                setAttributes(tokenElem, header_dict, corr_phrase, token)
-                        elif mode == "replace changed ones (requires id)":
-                            # check which childrens have changed
-                            # only delete and replace new ones
-                            for child in corr_phrase:
-                                for token in phrasedict[phrase_id][1]:
-                                    if child.attrib['id'] == str(token[0]):
-                                        child.text = token[1]
-                                        setAttributes(child, header_dict, corr_phrase, token)
-                        elif mode == "append":
-                            # simply add all tokens without consideration of old ones
-                            for token in phrasedict[phrase_id][1]:
-                                tokenElem = et.SubElement(corr_phrase, 'token', id=str(token[0]))
-                                tokenElem.text = token[1]
-                                setAttributes(tokenElem, header_dict, corr_phrase, token)
-                    else:
-                        self._info2.set("Phrase {}: No corresponding phrase was found in the Standard file".format(str(phrase_id)))
-                with open(self._indir.get(), mode="w", encoding="utf-8") as outf:
-                    treeResult = et.tostring(root, encoding="unicode", pretty_print=True)
-                    outf.write(treeResult)
-                    self._info.set("Standard file was written")
-            else:
-                self._info2.set("Your Webanno Import file contains no metadata column or the column is not called 'metadata'.")
+                                if child.attrib['id'] == str(token[0]):
+                                    child.text = token[1]
+                                    setAttributes(child, header_dict, corr_phrase, token)
+                    elif mode == "append":
+                        # simply add all tokens without consideration of old ones
+                        for token in phrasedict[phrase_id][1]:
+                            tokenElem = et.SubElement(corr_phrase, 'token', id=str(token[0]))
+                            tokenElem.text = token[1]
+                            setAttributes(tokenElem, header_dict, corr_phrase, token)
+                else:
+                    self._info2.set("Phrase {}: No corresponding phrase was found in the Standard file".format(str(phrase_id)))
+            with open(self._indir.get(), mode="w", encoding="utf-8") as outf:
+                treeResult = et.tostring(root, encoding="unicode", pretty_print=True)
+                outf.write(treeResult)
+                self._info.set("Standard file was written")
+            #~ else:
+                #~ self._info2.set("Your Webanno Import file contains no metadata column or the column is not called 'metadata'.")
+                
         else:
+            self._info2.set("Your Webanno Import file contains no metadata column or the column is not called 'metadata' or you have not assigned a file to merge with. A new file will be created.")
             # if no file is given, write a new Standard file
             new_file = os.path.basename(self._inWebAnno.get())[:-4]
             with open("output/"+new_file+"Standard.xml",mode="w",encoding="utf8") as f:
