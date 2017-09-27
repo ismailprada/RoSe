@@ -5,10 +5,8 @@
 # Version 4.0: Implementation in Tkinter
 # May 2017 (4.0: July 2017)
 
-###BEMERKUNGEN###
-# checkpublisher könnte bei exact_matches Probleme machen TODO
-###
 
+from copy import deepcopy
 import datetime
 import itertools
 from tkinter import *
@@ -150,6 +148,45 @@ class Search():
         Button(frame, text="Zurücksetzen", command=self.reset, width=10).grid(row=0, column=6, sticky=W+E, padx=5, pady=5)
         Button(frame, text="Schliessen", command=self.exit, width=10).grid(row=0, column=7, sticky=E, padx=5, pady=5)
         
+    
+    @staticmethod
+    def start_xml(out):
+        print("Creating xml")
+        root = ET.Element('corpus')
+        root.set('version', '1.0')
+        
+        out.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
+        
+        return root
+        
+        
+    @staticmethod
+    def add_phrase_to_xml(root, phrase):
+        # 1. Check if doc node already exists
+        # 2. Create and append doc node if necessary
+        # 3. Append phrase node to that doc node
+        this_doc = phrase.getparent()
+        print("Check doc...")
+        if this_doc.get("file") in [doc.get("file") for doc in root]:
+            for doc in root:
+                if doc.get("file") == this_doc.get("file"):
+                    to_add_doc = doc
+                    break
+            print("Doc found!")
+        else:
+            print("Doc not found, creating new one!")
+            to_add_doc = ET.SubElement(root, 'document', file=this_doc.get("file"), searchTerm=this_doc.get("searchTerm"))
+        print("Appending phrase")
+        to_add_doc.append(deepcopy(phrase))
+        
+    
+    @staticmethod
+    def write_xml(root, out):
+        print("Writing xml!")
+        tree = ET.tostring(root, encoding='unicode', pretty_print=True)
+        out.write(tree)
+        print("XMl written!")
+        
         
     def go(self):
         flagMETA = False
@@ -177,7 +214,9 @@ class Search():
                 return None
             flagMETA = True
         # run all phrases through the filters
-        with open("found_sentences.html", encoding="utf-8", mode="w") as outfile:
+        with open("output/found_sentences.html", encoding="utf-8", mode="w") as outfile, open("output/found_sentences.xml", encoding="utf-8", mode="w") as xmlout:
+            # Build root
+            found_root = self.start_xml(xmlout)
             output_parts = []
             general_counter = Counter()
             for action, phrase in tree:
@@ -199,6 +238,8 @@ class Search():
                         found_combinations = self.checkrelations(phrase)
                         if found_combinations:
                             general_counter["found_phrases"] += 1
+                            # Add found phrase to tree
+                            self.add_phrase_to_xml(found_root, phrase)
                             # Ausgabe sollte folgendermassen erfolgen:
                             # => Informationen zum Satz (id, publicationID bzw. Metadaten
                             # => Originaler Satz
@@ -251,6 +292,7 @@ class Search():
                     self.user_info.delete("1.0", END)
                     self.user_info.insert(END, "Checked phrases: {}; Found phrases: {}".format(general_counter["check_phrases"], general_counter["found_phrases"]))
                     self.user_info.update()
+            self.write_xml(found_root, xmlout)
             statistics = """
             <p>Phrases checked: {}<br>
             Phrases found:   {}<br>
@@ -264,7 +306,8 @@ class Search():
             output_parts.insert(0, output)  
             outfile.write(" ".join(output_parts))
             self.user_info.insert(END, "\nFinished writing!")
-        webbrowser.open("found_sentences.html")
+        webbrowser.open("output/found_sentences.html")
+        
                         
     def checkrelations(self, phrase):
         # Ziel: Alle Bedingungen müssen erfüllt sein mit einem einzigen Set an Token

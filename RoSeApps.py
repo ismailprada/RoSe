@@ -4,7 +4,7 @@ from RoSeData import htmlToStandardv5
 from RoSeData import SpanishTaggerv4
 from RoSeData import StandardToWebannov2
 from RoSeData import ToStandardv3
-from RoSeData import searchv4
+from RoSeData import searchv4_1
 from tkinter import *
 import webbrowser
 
@@ -34,7 +34,7 @@ def toStandard():
 def search():
     with open("RoSe.log", mode="a") as log:
         log.write("Starting Search Module.\n")
-        new_search = searchv4.Search()
+        new_search = searchv4_1.Search()
     
 def more_info():
     webbrowser.open("http://www.rose.uzh.ch/de/forschung/dom.html")
